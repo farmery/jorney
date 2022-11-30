@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "275329932653",
+    "project_id": "jorney-4c011",
+    "storage_bucket": "jorney-4c011.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:275329932653:android:9a41efe47f536cadb64e64",
+        "android_client_info": {
+          "package_name": "com.example.jorney"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "275329932653-j6m53mf0rvbvij5v12dv39lai0o5ado0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBq3r_t4BXNIXeCSEILBQEuDGSmIFc7utY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "275329932653-j6m53mf0rvbvij5v12dv39lai0o5ado0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "275329932653-0h9ll6ie26u7eo2to4b89059vet0kkr3.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.farmdev.jorney",
+                "app_store_id": "123456789"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
