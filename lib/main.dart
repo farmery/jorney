@@ -1,9 +1,12 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jorney/pages/nav/nav.dart';
 import 'package:jorney/utils/colors.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -14,6 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppColors();
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
@@ -22,7 +26,18 @@ class MyApp extends StatelessWidget {
         appBarTheme: AppBarTheme(backgroundColor: colors.primaryBg),
         fontFamily: 'SfProDisplay',
       ),
-      home: const Nav(),
+      home: FutureBuilder<Object>(
+        future: Firebase.initializeApp(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Scaffold(
+              backgroundColor: colors.primaryBg,
+              body: const Center(child: CupertinoActivityIndicator()),
+            );
+          }
+          return const Nav();
+        },
+      ),
     );
   }
 }

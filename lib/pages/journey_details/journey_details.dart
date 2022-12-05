@@ -1,12 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jorney/pages/home/home.dart';
+import 'package:jorney/pages/journey_details/journey_details_vm.dart';
 import 'package:jorney/utils/colors.dart';
 import 'package:jorney/utils/styles.dart';
 import '../../models/journey.dart';
 import '../../widgets/close_btn.dart';
 
-class JourneyDetails extends StatelessWidget {
+class JourneyDetails extends ConsumerStatefulWidget {
   const JourneyDetails({super.key, required this.journey});
   final Journey journey;
 
@@ -18,7 +21,21 @@ class JourneyDetails extends StatelessWidget {
       );
 
   @override
+  ConsumerState<JourneyDetails> createState() => _JourneyDetailsState();
+}
+
+class _JourneyDetailsState extends ConsumerState<JourneyDetails> {
+  @override
+  void initState() {
+    super.initState();
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+      ref.read(progressVm.notifier).getProgress(widget.journey.journeyId!);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final progressList = ref.watch(progressVm);
     final colors = AppColors();
     final styles = TextStyles();
     return CupertinoPageScaffold(
@@ -33,13 +50,13 @@ class JourneyDetails extends StatelessWidget {
               trailing: Padding(
                 padding: const EdgeInsets.only(right: 16),
                 child: Text(
-                  'Day ${journey.progress}',
+                  '${widget.journey.journeyType.toString()} ${widget.journey.level}',
                   style: styles.body.copyWith(color: colors.accent),
                 ),
               ),
               padding: const EdgeInsetsDirectional.only(),
               largeTitle: Text(
-                '${journey.title}',
+                '${widget.journey.title}',
                 style: TextStyle(color: colors.primaryTextColor),
               ),
             )
@@ -63,37 +80,49 @@ class JourneyDetails extends StatelessWidget {
                   ),
                   title: 'Upload Progress',
                   subtitle:
-                      'Upload Image and details about your progress for the ${journey.journeyType.toString()}',
+                      'Upload Image and details about your progress for the ${widget.journey.journeyType.toString()}',
                   onPressed: () {},
                 ),
-                Expanded(
-                  child: GridView.count(
-                    physics: const BouncingScrollPhysics(),
-                    crossAxisCount: 5,
-                    childAspectRatio: 1,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    children: List.generate(
-                      journey.progress!,
-                      (index) => Container(
-                        decoration: BoxDecoration(
-                          color: colors.primaryCard,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              journey.journeyType.toString(),
-                              style: const TextStyle(color: Colors.white54),
+                if (progressList != null)
+                  Expanded(
+                    child: GridView.count(
+                      physics: const BouncingScrollPhysics(),
+                      crossAxisCount: 5,
+                      childAspectRatio: 1,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      children: List.generate(
+                        progressList.length,
+                        (index) {
+                          final progress = progressList[index];
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: progress.tracked
+                                  ? colors.primaryCard
+                                  : colors.greyDark,
+                              borderRadius: BorderRadius.circular(10),
+                              border: progress.tracked
+                                  ? null
+                                  : Border.all(color: colors.accent),
                             ),
-                            Text((index + 1).toString(), style: styles.title)
-                          ],
-                        ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  widget.journey.journeyType.toString(),
+                                  style: const TextStyle(color: Colors.white54),
+                                ),
+                                Text(
+                                  (progressList[index].progressNo).toString(),
+                                  style: styles.title,
+                                )
+                              ],
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),
-                ),
               ],
             ),
           ),

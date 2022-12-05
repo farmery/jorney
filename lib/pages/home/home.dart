@@ -1,17 +1,34 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:jorney/models/journey.dart';
+import 'package:jorney/pages/home/home_vm.dart';
 import 'package:jorney/pages/journey_details/journey_details.dart';
 import 'package:jorney/utils/colors.dart';
 import 'package:jorney/utils/device_dimens.dart';
 import 'package:jorney/utils/styles.dart';
 
-class Home extends StatelessWidget {
+class Home extends ConsumerStatefulWidget {
   const Home({super.key});
 
   @override
+  ConsumerState<Home> createState() => _HomeState();
+}
+
+class _HomeState extends ConsumerState<Home> {
+  @override
+  void initState() {
+    super.initState();
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+      ref.read(homeVm.notifier).getJourneys();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final journeys = ref.watch(homeVm);
     final colors = AppColors();
     final styles = TextStyles();
     return CupertinoPageScaffold(
@@ -47,69 +64,74 @@ class Home extends StatelessWidget {
               const SizedBox(height: 16),
               Text('Ongoing Journeys', style: styles.subtitle1),
               const SizedBox(height: 16),
-              CupertinoButton(
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    JourneyDetails.route(
-                      Journey(
-                        progress: 20,
-                        title: 'Weight Loss',
-                        journeyType: JourneyType.daily,
-                      ),
-                    ),
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: colors.secondaryBg,
-                  ),
-                  child: Row(
-                    children: [
-                      CupertinoButton(
-                        onPressed: () {},
-                        padding: EdgeInsets.zero,
-                        child: CircleAvatar(
-                          radius: 30,
-                          backgroundColor: Colors.white10,
-                          child: Icon(
-                            CupertinoIcons.play_circle_fill,
-                            color: colors.primaryTextColor,
-                            size: 30,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: SizedBox(
-                          width: deviceWidth(context) * 0.6,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Weight Loss Journey',
-                                  style: styles.subtitle2),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Day 20',
-                                style: styles.title.copyWith(fontSize: 24),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Icon(
-                        CupertinoIcons.chevron_forward,
-                        color: colors.greyLight,
-                      )
-                    ],
-                  ),
-                ),
-              ),
+              if (journeys != null)
+                ...List.generate(
+                  journeys.length,
+                  (index) => JourneyItemView(journey: journeys[index]),
+                )
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class JourneyItemView extends StatelessWidget {
+  const JourneyItemView({
+    Key? key,
+    required this.journey,
+  }) : super(key: key);
+  final Journey journey;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppColors colors = AppColors();
+    final TextStyles styles = TextStyles();
+    return CupertinoButton(
+      padding: EdgeInsets.zero,
+      onPressed: () {
+        Navigator.push(
+          context,
+          JourneyDetails.route(journey),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: colors.secondaryBg,
+        ),
+        child: Row(
+          children: [
+            const CircleAvatar(
+              radius: 30,
+              backgroundColor: Colors.white10,
+              child: Icon(Icons.ac_unit_outlined),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: SizedBox(
+                width: deviceWidth(context) * 0.6,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(journey.title ?? '--', style: styles.body),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${journey.journeyType.toString()} ${journey.level}',
+                      style: styles.title.copyWith(fontSize: 24),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Icon(
+              CupertinoIcons.chevron_forward,
+              color: colors.greyLight,
+            )
+          ],
         ),
       ),
     );

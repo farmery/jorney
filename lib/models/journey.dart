@@ -1,33 +1,43 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Journey {
   String? userId;
   String? title;
   String? journeyId;
-  int? progress;
+  int? level;
   JourneyType journeyType;
+  DateTime? createdAt;
+  DateTime? startDate;
   Journey({
     this.userId,
     this.title,
     this.journeyId,
-    this.progress,
+    this.level,
     this.journeyType = JourneyType.monthly,
+    this.createdAt,
+    this.startDate,
   });
 
   Journey copyWith({
     String? userId,
     String? title,
     String? journeyId,
-    int? progress,
+    int? level,
     JourneyType? journeyType,
+    DateTime? createdAt,
+    DateTime? startDate,
   }) {
     return Journey(
       userId: userId ?? this.userId,
       title: title ?? this.title,
       journeyId: journeyId ?? this.journeyId,
-      progress: progress ?? this.progress,
+      level: level ?? this.level,
       journeyType: journeyType ?? this.journeyType,
+      createdAt: createdAt ?? this.createdAt,
+      startDate: startDate ?? this.startDate,
     );
   }
 
@@ -36,8 +46,8 @@ class Journey {
       'userId': userId,
       'title': title,
       'journeyId': journeyId,
-      'progress': progress,
-      'journeyType': journeyType,
+      'level': level,
+      'journeyType': journeyType.index,
     };
   }
 
@@ -46,7 +56,10 @@ class Journey {
       userId: map['userId'] != null ? map['userId'] as String : null,
       title: map['title'] != null ? map['title'] as String : null,
       journeyId: map['journeyId'] != null ? map['journeyId'] as String : null,
-      progress: map['progress'] != null ? map['progress'] as int : null,
+      level: map['level'] != null ? map['level'] as int : null,
+      journeyType: getJourneyType(map['journeyType']),
+      createdAt: (map['createdAt'] as Timestamp).toDate(),
+      startDate: (map['startDate'] as Timestamp).toDate(),
     );
   }
 
@@ -57,7 +70,7 @@ class Journey {
 
   @override
   String toString() {
-    return 'Journey(userId: $userId, title: $title, journeyId: $journeyId, progress: $progress), journeyType: $journeyType';
+    return 'Journey(userId: $userId, title: $title, journeyId: $journeyId, level: $level), journeyType: $journeyType';
   }
 
   @override
@@ -68,7 +81,8 @@ class Journey {
         other.title == title &&
         other.journeyId == journeyId &&
         other.journeyType == journeyType &&
-        other.progress == progress;
+        other.createdAt == createdAt &&
+        other.level == level;
   }
 
   @override
@@ -77,7 +91,7 @@ class Journey {
         title.hashCode ^
         journeyId.hashCode ^
         journeyType.hashCode ^
-        progress.hashCode;
+        level.hashCode;
   }
 }
 
@@ -98,4 +112,16 @@ enum JourneyType {
     }
     return '';
   }
+}
+
+JourneyType getJourneyType(String? val) {
+  switch (val) {
+    case 'daily':
+      return JourneyType.daily;
+    case 'weekly':
+      return JourneyType.weekly;
+    case 'monthly':
+      return JourneyType.monthly;
+  }
+  return JourneyType.weekly;
 }
