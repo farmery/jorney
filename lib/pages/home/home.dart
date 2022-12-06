@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:jorney/models/journey.dart';
 import 'package:jorney/pages/home/home_vm.dart';
 import 'package:jorney/pages/journey_details/journey_details.dart';
+import 'package:jorney/pages/new_journey/new_jourmey.dart';
 import 'package:jorney/utils/colors.dart';
 import 'package:jorney/utils/device_dimens.dart';
 import 'package:jorney/utils/styles.dart';
@@ -59,7 +60,9 @@ class _HomeState extends ConsumerState<Home> {
                 title: 'New Journey',
                 subtitle:
                     'At the end of your journey you can export your progress as a timelapse ',
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(context, NewJourney.route());
+                },
               ),
               const SizedBox(height: 16),
               Text('Ongoing Journeys', style: styles.subtitle1),

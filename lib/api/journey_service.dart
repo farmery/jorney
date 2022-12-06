@@ -46,4 +46,17 @@ class JourneyService {
       return ApiResponse.error('An Error Occured');
     }
   }
+
+  Future<ApiResponse<String>> updateProgress(Progress progress) async {
+    try {
+      final progressRef = journeyCollection
+          .doc(progress.journeyId)
+          .collection('progress')
+          .doc(progress.progressId);
+      progressRef.update({'imageUrl': progress.imgUrl, 'tracked': true});
+      return ApiResponse.success('Success');
+    } catch (e) {
+      return ApiResponse.error('An Error Occured');
+    }
+  }
 }

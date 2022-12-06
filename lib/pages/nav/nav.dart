@@ -1,14 +1,24 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jorney/pages/history/history.dart';
 import 'package:jorney/pages/home/home.dart';
-import 'package:jorney/pages/nav/nav_vm.dart';
 import 'package:jorney/utils/colors.dart';
 
-class Nav extends ConsumerWidget {
+class Nav extends StatefulWidget {
   const Nav({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  State<Nav> createState() => _NavState();
+}
+
+class _NavState extends State<Nav> with AutomaticKeepAliveClientMixin {
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    List pages = const [
+      Home(),
+      History(),
+      History(),
+    ];
     final colors = AppColors();
     return CupertinoTabScaffold(
       backgroundColor: colors.primaryBg,
@@ -22,12 +32,15 @@ class Nav extends ConsumerWidget {
           BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.time), label: 'History'),
           BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.person_alt_circle), label: 'Profile'),
+              icon: Icon(CupertinoIcons.settings), label: 'Settings'),
         ],
       ),
       tabBuilder: (context, index) {
-        return const Home();
+        return pages[index];
       },
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

@@ -5,14 +5,14 @@ class Progress {
   String? journeyId;
   String? progressId;
   int progressNo;
-  String? imageUrl;
+  String? imgUrl;
   bool tracked;
 
   Progress({
     this.journeyId,
     this.progressId,
     this.progressNo = 0,
-    this.imageUrl,
+    this.imgUrl,
     this.tracked = false,
   });
 
@@ -20,14 +20,14 @@ class Progress {
     String? journeyId,
     String? progressId,
     int? progressNo,
-    String? imageUrl,
+    String? imgUrl,
     bool? tracked,
   }) {
     return Progress(
       journeyId: journeyId ?? this.journeyId,
       progressId: progressId ?? this.progressId,
       progressNo: progressNo ?? this.progressNo,
-      imageUrl: imageUrl ?? this.imageUrl,
+      imgUrl: imgUrl ?? this.imgUrl,
       tracked: tracked ?? this.tracked,
     );
   }
@@ -37,7 +37,7 @@ class Progress {
       'journeyId': journeyId,
       'progressId': progressId,
       'progressNo': progressNo,
-      'imageUrl': imageUrl,
+      'imgUrl': imgUrl,
       'tracked': tracked,
     };
   }
@@ -48,7 +48,7 @@ class Progress {
       progressId:
           map['progressId'] != null ? map['progressId'] as String : null,
       progressNo: map['progressNo'] as int,
-      imageUrl: map['imageUrl'] != null ? map['imageUrl'] as String : null,
+      imgUrl: map['imgUrl'] != null ? map['imgUrl'] as String : null,
       tracked: map['tracked'] as bool,
     );
   }
@@ -60,7 +60,7 @@ class Progress {
 
   @override
   String toString() {
-    return 'Progress(journeyId: $journeyId, progressId: $progressId, progressNo: $progressNo, imageUrl: $imageUrl, tracked: $tracked)';
+    return 'Progress(journeyId: $journeyId, progressId: $progressId, progressNo: $progressNo, imgUrl: $imgUrl, tracked: $tracked)';
   }
 
   @override
@@ -70,7 +70,7 @@ class Progress {
     return other.journeyId == journeyId &&
         other.progressId == progressId &&
         other.progressNo == progressNo &&
-        other.imageUrl == imageUrl &&
+        other.imgUrl == imgUrl &&
         other.tracked == tracked;
   }
 
@@ -79,7 +79,7 @@ class Progress {
     return journeyId.hashCode ^
         progressId.hashCode ^
         progressNo.hashCode ^
-        imageUrl.hashCode ^
+        imgUrl.hashCode ^
         tracked.hashCode;
   }
 }

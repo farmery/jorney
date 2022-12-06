@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:jorney/pages/home/home.dart';
 import 'package:jorney/pages/journey_details/journey_details_vm.dart';
+import 'package:jorney/pages/progress_details/progress_details.dart';
 import 'package:jorney/utils/colors.dart';
 import 'package:jorney/utils/styles.dart';
 import '../../models/journey.dart';
@@ -13,9 +13,9 @@ class JourneyDetails extends ConsumerStatefulWidget {
   const JourneyDetails({super.key, required this.journey});
   final Journey journey;
 
-  static Route route(Journey journey) => PageRouteBuilder(
+  static Route route(Journey journey) => CupertinoPageRoute(
         fullscreenDialog: true,
-        pageBuilder: (context, animation, secondaryAnimation) {
+        builder: (context) {
           return JourneyDetails(journey: journey);
         },
       );
@@ -68,24 +68,16 @@ class _JourneyDetailsState extends ConsumerState<JourneyDetails> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                ActionCard(
-                  leading: CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Colors.white10,
-                    child: Icon(
-                      CupertinoIcons.camera_circle_fill,
-                      size: 30,
-                      color: colors.primaryTextColor,
-                    ),
+                Container(
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: colors.accent.withOpacity(0.1),
                   ),
-                  title: 'Upload Progress',
-                  subtitle:
-                      'Upload Image and details about your progress for the ${widget.journey.journeyType.toString()}',
-                  onPressed: () {},
                 ),
                 if (progressList != null)
                   Expanded(
                     child: GridView.count(
+                      padding: const EdgeInsets.only(top: 24),
                       physics: const BouncingScrollPhysics(),
                       crossAxisCount: 5,
                       childAspectRatio: 1,
@@ -95,28 +87,40 @@ class _JourneyDetailsState extends ConsumerState<JourneyDetails> {
                         progressList.length,
                         (index) {
                           final progress = progressList[index];
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: progress.tracked
-                                  ? colors.primaryCard
-                                  : colors.greyDark,
-                              borderRadius: BorderRadius.circular(10),
-                              border: progress.tracked
-                                  ? null
-                                  : Border.all(color: colors.accent),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  widget.journey.journeyType.toString(),
-                                  style: const TextStyle(color: Colors.white54),
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                ProgressDetails.route(
+                                  progress,
+                                  widget.journey.journeyType,
                                 ),
-                                Text(
-                                  (progressList[index].progressNo).toString(),
-                                  style: styles.title,
-                                )
-                              ],
+                              );
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: progress.tracked
+                                    ? colors.primaryCard
+                                    : colors.greyDark,
+                                borderRadius: BorderRadius.circular(10),
+                                border: progress.tracked
+                                    ? null
+                                    : Border.all(color: colors.accent),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    widget.journey.journeyType.toString(),
+                                    style:
+                                        const TextStyle(color: Colors.white54),
+                                  ),
+                                  Text(
+                                    (progressList[index].progressNo).toString(),
+                                    style: styles.title,
+                                  )
+                                ],
+                              ),
                             ),
                           );
                         },

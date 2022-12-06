@@ -47,7 +47,9 @@ class Journey {
       'title': title,
       'journeyId': journeyId,
       'level': level,
-      'journeyType': journeyType.index,
+      'journeyType': journeyType.name,
+      'startDate': startDate,
+      'createdAt': createdAt,
     };
   }
 
