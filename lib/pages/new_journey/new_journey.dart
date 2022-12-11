@@ -1,9 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jorney/pages/new_journey/new_journey_vm.dart';
+import 'package:jorney/services/auth_service.dart';
 import 'package:jorney/utils/colors.dart';
+import 'package:jorney/utils/notify_vm.dart';
 import 'package:jorney/utils/styles.dart';
 import '../../models/journey.dart';
+import '../../widgets/app_btn.dart';
 import '../../widgets/close_btn.dart';
 
 class NewJourney extends ConsumerStatefulWidget {
@@ -19,11 +23,8 @@ class NewJourney extends ConsumerStatefulWidget {
 class _NewJourneyState extends ConsumerState<NewJourney> {
   @override
   Widget build(BuildContext context) {
-    List<String> journeyTypes = [
-      JourneyType.daily.name,
-      JourneyType.weekly.name,
-      JourneyType.monthly.name,
-    ];
+    final vm = ref.watch(newJourneyVm.notifier);
+    ref.watch(newJourneyVm);
     final colors = AppColors();
     final styles = TextStyles();
     return GestureDetector(
@@ -55,6 +56,14 @@ class _NewJourneyState extends ConsumerState<NewJourney> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     TextFormField(
+                      validator: (value) {
+                        if (!vm.validateTitle()) {
+                          return 'Please enter a valid title';
+                        }
+                        return null;
+                      },
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      onChanged: vm.setTitle,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: colors.secondaryBg,
@@ -81,25 +90,8 @@ class _NewJourneyState extends ConsumerState<NewJourney> {
                       style: styles.subtitle2,
                     ),
                     const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: List.generate(
-                        journeyTypes.length,
-                        (index) => Expanded(
-                          child: Container(
-                            margin: const EdgeInsets.only(right: 16),
-                            alignment: Alignment.center,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: colors.primaryCard,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child:
-                                Text(journeyTypes[index], style: styles.body),
-                          ),
-                        ),
-                      ),
-                    )
+                    const JourneyTypeSelector(),
+                    const SizedBox(height: 24),
                   ],
                 ),
               ),
@@ -108,22 +100,75 @@ class _NewJourneyState extends ConsumerState<NewJourney> {
               left: 16,
               right: 16,
               bottom: MediaQuery.of(context).padding.bottom + 16,
-              child: CupertinoButton(
-                padding: EdgeInsets.zero,
-                child: Container(
-                  height: 40,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: colors.accent,
-                  ),
-                  child: Text('Start Journey', style: styles.body),
-                ),
-                onPressed: () {},
+              child: AppBtn(
+                enabled: vm.validateTitle(),
+                text: 'Start journey',
+                onPressed: () async {
+                  final notify = ref.read(notifyVm);
+                  final user = ref.read(authStateChanges).value!;
+                  final isSuccessful = await vm.startJourney(user.userId!);
+                  if (!isSuccessful) {
+                    return;
+                  }
+                  if (!mounted) return;
+                  Navigator.pop(context, true);
+                  notify.showMsg('Journey Created');
+                  return;
+                },
               ),
             )
           ],
         ),
+      ),
+    );
+  }
+}
+
+class JourneyTypeSelector extends ConsumerWidget {
+  const JourneyTypeSelector({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colors = AppColors();
+    final styles = TextStyles();
+    List<JourneyType> journeyTypes = [
+      JourneyType.daily,
+      JourneyType.weekly,
+      JourneyType.monthly,
+    ];
+    final journey = ref.watch(newJourneyVm);
+    final vm = ref.watch(newJourneyVm.notifier);
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: List.generate(
+        journeyTypes.length,
+        (index) {
+          bool isSelected = journeyTypes[index] == journey.journeyType;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () {
+                vm.setJourneyType(journeyTypes[index]);
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                margin: const EdgeInsets.only(right: 16),
+                alignment: Alignment.center,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: isSelected ? colors.accent : colors.primaryCard,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  journeyTypes[index].name,
+                  style: styles.body,
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

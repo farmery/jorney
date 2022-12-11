@@ -29,12 +29,13 @@ class _JourneyDetailsState extends ConsumerState<JourneyDetails> {
   void initState() {
     super.initState();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      ref.read(progressVm.notifier).getProgress(widget.journey.journeyId!);
+      ref.read(progressVm.notifier).getProgressList(widget.journey.journeyId!);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    print(widget.journey.toString());
     final progressList = ref.watch(progressVm);
     final colors = AppColors();
     final styles = TextStyles();

@@ -11,6 +11,7 @@ class Journey {
   JourneyType journeyType;
   DateTime? createdAt;
   DateTime? startDate;
+  int? maxLevel;
   Journey({
     this.userId,
     this.title,
@@ -19,6 +20,7 @@ class Journey {
     this.journeyType = JourneyType.monthly,
     this.createdAt,
     this.startDate,
+    this.maxLevel,
   });
 
   Journey copyWith({
@@ -29,6 +31,7 @@ class Journey {
     JourneyType? journeyType,
     DateTime? createdAt,
     DateTime? startDate,
+    int? maxLevel,
   }) {
     return Journey(
       userId: userId ?? this.userId,
@@ -38,6 +41,7 @@ class Journey {
       journeyType: journeyType ?? this.journeyType,
       createdAt: createdAt ?? this.createdAt,
       startDate: startDate ?? this.startDate,
+      maxLevel: maxLevel ?? this.maxLevel,
     );
   }
 
@@ -46,10 +50,11 @@ class Journey {
       'userId': userId,
       'title': title,
       'journeyId': journeyId,
-      'level': level,
+      'level': level ?? 0,
       'journeyType': journeyType.name,
-      'startDate': startDate,
-      'createdAt': createdAt,
+      'startDate': startDate?.toIso8601String(),
+      'createdAt': createdAt?.toIso8601String(),
+      'maxLevel': maxLevel,
     };
   }
 
@@ -60,8 +65,21 @@ class Journey {
       journeyId: map['journeyId'] != null ? map['journeyId'] as String : null,
       level: map['level'] != null ? map['level'] as int : null,
       journeyType: getJourneyType(map['journeyType']),
+      createdAt: DateTime.parse(map['createdAt']),
+      startDate: DateTime.parse(map['startDate']),
+      maxLevel: map['maxLevel'],
+    );
+  }
+  factory Journey.fromFirebase(Map<String, dynamic> map) {
+    return Journey(
+      userId: map['userId'] != null ? map['userId'] as String : null,
+      title: map['title'] != null ? map['title'] as String : null,
+      journeyId: map['journeyId'] != null ? map['journeyId'] as String : null,
+      level: map['level'] != null ? map['level'] as int : null,
+      journeyType: getJourneyType(map['journeyType']),
       createdAt: (map['createdAt'] as Timestamp).toDate(),
       startDate: (map['startDate'] as Timestamp).toDate(),
+      maxLevel: map['maxLevel'],
     );
   }
 
@@ -72,7 +90,7 @@ class Journey {
 
   @override
   String toString() {
-    return 'Journey(userId: $userId, title: $title, journeyId: $journeyId, level: $level), journeyType: $journeyType';
+    return 'Journey(userId: $userId, title: $title, journeyId: $journeyId, level: $level), journeyType: $journeyType, createdAt: $createdAt, startDate: $startDate, mmaxLevel: $maxLevel';
   }
 
   @override
@@ -84,6 +102,8 @@ class Journey {
         other.journeyId == journeyId &&
         other.journeyType == journeyType &&
         other.createdAt == createdAt &&
+        other.startDate == startDate &&
+        other.maxLevel == maxLevel &&
         other.level == level;
   }
 
@@ -93,7 +113,10 @@ class Journey {
         title.hashCode ^
         journeyId.hashCode ^
         journeyType.hashCode ^
-        level.hashCode;
+        level.hashCode ^
+        createdAt.hashCode ^
+        startDate.hashCode ^
+        maxLevel.hashCode;
   }
 }
 

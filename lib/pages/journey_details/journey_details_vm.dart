@@ -1,13 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:jorney/api/journey_service.dart';
 import 'package:jorney/models/progress.dart';
+import 'package:jorney/services/db_service.dart';
 
 class ProgressVm extends StateNotifier<List<Progress>?> {
   ProgressVm() : super(null);
-  final service = JourneyService();
+  final service = DbService();
 
-  getProgress(String journeyId) async {
-    final res = await service.getProgress(journeyId);
+  getProgressList(String journeyId) async {
+    final res = await service.getProgressList(journeyId);
     if (res.error != null) {
       state = null;
       return;

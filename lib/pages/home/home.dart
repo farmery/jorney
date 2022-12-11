@@ -6,10 +6,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:jorney/models/journey.dart';
 import 'package:jorney/pages/home/home_vm.dart';
 import 'package:jorney/pages/journey_details/journey_details.dart';
-import 'package:jorney/pages/new_journey/new_jourmey.dart';
+import 'package:jorney/pages/new_journey/new_journey.dart';
+import 'package:jorney/services/auth_service.dart';
 import 'package:jorney/utils/colors.dart';
 import 'package:jorney/utils/device_dimens.dart';
 import 'package:jorney/utils/styles.dart';
+import 'package:lottie/lottie.dart';
 
 class Home extends ConsumerStatefulWidget {
   const Home({super.key});
@@ -23,12 +25,13 @@ class _HomeState extends ConsumerState<Home> {
   void initState() {
     super.initState();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      ref.read(homeVm.notifier).getJourneys();
+      ref.read(homeVm.notifier).getJourneys('userId');
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final user = ref.read(authStateChanges).value!;
     final journeys = ref.watch(homeVm);
     final colors = AppColors();
     final styles = TextStyles();
@@ -60,18 +63,35 @@ class _HomeState extends ConsumerState<Home> {
                 title: 'New Journey',
                 subtitle:
                     'At the end of your journey you can export your progress as a timelapse ',
-                onPressed: () {
-                  Navigator.push(context, NewJourney.route());
+                onPressed: () async {
+                  final journeyIsCreated =
+                      await Navigator.push(context, NewJourney.route());
+                  if (journeyIsCreated == true) {
+                    ref.read(homeVm.notifier).getJourneys(user.userId!);
+                  }
                 },
               ),
               const SizedBox(height: 16),
-              Text('Ongoing Journeys', style: styles.subtitle1),
-              const SizedBox(height: 16),
-              if (journeys != null)
+              if (journeys == null)
+                const SizedBox()
+              else if (journeys.isNotEmpty) ...[
+                Text('Ongoing Journeys', style: styles.subtitle1),
                 ...List.generate(
                   journeys.length,
                   (index) => JourneyItemView(journey: journeys[index]),
                 )
+              ] else if (journeys.isEmpty) ...[
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: LottieBuilder.asset('assets/icons/empty.json'),
+                ),
+                Center(
+                  child: Text(
+                    'You currently dont have any active journeys',
+                    style: styles.body,
+                  ),
+                )
+              ]
             ],
           ),
         ),

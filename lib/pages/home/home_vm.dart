@@ -1,14 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jorney/models/journey.dart';
-
-import '../../api/journey_service.dart';
+import 'package:jorney/services/db_service.dart';
 
 class HomeVm extends StateNotifier<List<Journey>?> {
   HomeVm() : super(null);
-  final journeyService = JourneyService();
+  final sercice = DbService();
 
-  getJourneys() async {
-    final res = await journeyService.getJourneys();
+  getJourneys(String userId) async {
+    final res = await sercice.getJourneyList(userId);
     if (res.error != null) {
       state = [];
       return;

@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:jorney/models/journey.dart';
 import 'package:jorney/pages/journey_details/journey_details.dart';
-import 'package:jorney/pages/new_journey/new_jourmey.dart';
+import 'package:jorney/pages/new_journey/new_journey.dart';
 import 'package:jorney/utils/colors.dart';
 import 'package:jorney/utils/device_dimens.dart';
 import 'package:jorney/utils/styles.dart';

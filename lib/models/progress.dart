@@ -7,6 +7,7 @@ class Progress {
   int progressNo;
   String? imgUrl;
   bool tracked;
+  String? base64Img;
 
   Progress({
     this.journeyId,
@@ -14,6 +15,7 @@ class Progress {
     this.progressNo = 0,
     this.imgUrl,
     this.tracked = false,
+    this.base64Img,
   });
 
   Progress copyWith({
@@ -22,6 +24,7 @@ class Progress {
     int? progressNo,
     String? imgUrl,
     bool? tracked,
+    String? base64Img,
   }) {
     return Progress(
       journeyId: journeyId ?? this.journeyId,
@@ -29,6 +32,7 @@ class Progress {
       progressNo: progressNo ?? this.progressNo,
       imgUrl: imgUrl ?? this.imgUrl,
       tracked: tracked ?? this.tracked,
+      base64Img: base64Img ?? this.base64Img,
     );
   }
 
@@ -37,8 +41,8 @@ class Progress {
       'journeyId': journeyId,
       'progressId': progressId,
       'progressNo': progressNo,
-      'imgUrl': imgUrl,
       'tracked': tracked,
+      'base64Img': base64Img,
     };
   }
 
@@ -50,6 +54,7 @@ class Progress {
       progressNo: map['progressNo'] as int,
       imgUrl: map['imgUrl'] != null ? map['imgUrl'] as String : null,
       tracked: map['tracked'] as bool,
+      base64Img: map['base64Img'] != null ? map['base64Img'] as String : null,
     );
   }
 
@@ -60,7 +65,7 @@ class Progress {
 
   @override
   String toString() {
-    return 'Progress(journeyId: $journeyId, progressId: $progressId, progressNo: $progressNo, imgUrl: $imgUrl, tracked: $tracked)';
+    return 'Progress(journeyId: $journeyId, progressId: $progressId, progressNo: $progressNo, imgUrl: $imgUrl, tracked: $tracked, base64Img: $base64Img)';
   }
 
   @override
@@ -71,7 +76,8 @@ class Progress {
         other.progressId == progressId &&
         other.progressNo == progressNo &&
         other.imgUrl == imgUrl &&
-        other.tracked == tracked;
+        other.tracked == tracked &&
+        other.base64Img == base64Img;
   }
 
   @override
@@ -80,6 +86,7 @@ class Progress {
         progressId.hashCode ^
         progressNo.hashCode ^
         imgUrl.hashCode ^
-        tracked.hashCode;
+        tracked.hashCode ^
+        base64Img.hashCode;
   }
 }
